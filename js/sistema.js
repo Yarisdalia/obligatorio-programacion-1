@@ -10,17 +10,17 @@ class Sistema {
     existeUsername(username) {
         let existe = false;
         
-        // Revisar en paseadores
+        // Verificar en paseadores
         for (let i = 0; i < this.paseadores.length; i++) {
-            if (this.paseadores[i].username.toLowerCase() === username.toLowerCase()) {
+            if (this.paseadores[i].username === username) {
                 existe = true;
                 break;
             }
         }
         
-        // Revisar en clientes
+        // Verificar en clientes
         for (let i = 0; i < this.clientes.length; i++) {
-            if (this.clientes[i].username.toLowerCase() === username.toLowerCase()) {
+            if (this.clientes[i].username === username) {
                 existe = true;
                 break;
             }
@@ -31,8 +31,8 @@ class Sistema {
     
     // Validar contraseña según requerimientos
     validarPassword(password) {
-        if (password.length < 5) {
-            return false;
+        if (password.length < 8) {
+            return "La contraseña debe tener al menos 8 caracteres";
         }
         
         let tieneMayuscula = false;
@@ -40,41 +40,51 @@ class Sistema {
         let tieneNumero = false;
         
         for (let i = 0; i < password.length; i++) {
-            let caracter = password[i];
+            const caracter = password[i];
             if (caracter >= 'A' && caracter <= 'Z') {
                 tieneMayuscula = true;
-            }
-            if (caracter >= 'a' && caracter <= 'z') {
+            } else if (caracter >= 'a' && caracter <= 'z') {
                 tieneMinuscula = true;
-            }
-            if (caracter >= '0' && caracter <= '9') {
+            } else if (caracter >= '0' && caracter <= '9') {
                 tieneNumero = true;
             }
         }
         
-        return tieneMayuscula && tieneMinuscula && tieneNumero;
+        if (!tieneMayuscula) {
+            return "La contraseña debe tener al menos una mayúscula";
+        }
+        if (!tieneMinuscula) {
+            return "La contraseña debe tener al menos una minúscula";
+        }
+        if (!tieneNumero) {
+            return "La contraseña debe tener al menos un número";
+        }
+        
+        return "valida";
     }
     
     // Registrar nuevo cliente
     registrarCliente(nombre, username, password, nombrePerro, tamanoPerro) {
+        // Validar campos vacíos
+        if (nombre === "" || username === "" || password === "" || nombrePerro === "" || tamanoPerro === "") {
+            return "Todos los campos son obligatorios";
+        }
+        
         // Validar username único
         if (this.existeUsername(username)) {
             return "El nombre de usuario ya existe";
         }
         
         // Validar contraseña
-        if (!this.validarPassword(password)) {
-            return "La contraseña debe tener mínimo 5 caracteres, incluyendo al menos una mayúscula, una minúscula y un número";
-        }
-        
-        // Validar campos vacíos
-        if (nombre === "" || username === "" || password === "" || nombrePerro === "" || tamanoPerro === "") {
-            return "Todos los campos son obligatorios";
+        if (this.validarPassword(password) !== "valida") {
+            return this.validarPassword(password);
         }
         
         // Crear perro y cliente
-        let perro = new Perro(nombrePerro, tamanoPerro);
-        let cliente = new Cliente(nombre, username, password, perro);
+        const perro = new Perro(nombrePerro, tamanoPerro);
+        const cliente = new Cliente(nombre, username, password, perro);
+        
+        // Agregar cliente al sistema
         this.clientes.push(cliente);
         
         return "ok";
@@ -84,23 +94,31 @@ class Sistema {
     login(username, password) {
         this.userLogged = null;
         
-        // Buscar en paseadores (case-insensitive)
+        // Buscar en paseadores
         for (let i = 0; i < this.paseadores.length; i++) {
-            if (this.paseadores[i].username.toLowerCase() === username.toLowerCase() && this.paseadores[i].getPassword() === password) {
-                this.userLogged = this.paseadores[i];
-                return "ok";
+            if (this.paseadores[i].username === username) {
+                if (this.paseadores[i].getPassword() === password) {
+                    this.userLogged = this.paseadores[i];
+                    return "ok";
+                } else {
+                    return "Contraseña incorrecta";
+                }
             }
         }
         
-        // Buscar en clientes (case-insensitive)
+        // Buscar en clientes
         for (let i = 0; i < this.clientes.length; i++) {
-            if (this.clientes[i].username.toLowerCase() === username.toLowerCase() && this.clientes[i].getPassword() === password) {
-                this.userLogged = this.clientes[i];
-                return "ok";
+            if (this.clientes[i].username === username) {
+                if (this.clientes[i].getPassword() === password) {
+                    this.userLogged = this.clientes[i];
+                    return "ok";
+                } else {
+                    return "Contraseña incorrecta";
+                }
             }
         }
         
-        return "Usuario o contraseña incorrectos";
+        return "Usuario no encontrado";
     }
     
     // Calcular cupos ocupados por un paseador
@@ -109,7 +127,7 @@ class Sistema {
         
         for (let i = 0; i < this.contrataciones.length; i++) {
             if (this.contrataciones[i].paseador.id === paseador.id && this.contrataciones[i].estado === "aprobada") {
-                let tamano = this.contrataciones[i].cliente.perro.tamano;
+                const tamano = this.contrataciones[i].cliente.perro.tamano;
                 if (tamano === "grande") {
                     cuposOcupados += 4;
                 } else if (tamano === "mediano") {
@@ -149,14 +167,21 @@ class Sistema {
     
     // Obtener paseadores disponibles para un cliente
     getPaseadoresDisponibles(cliente) {
-        let disponibles = [];
-        let tamanoPerro = cliente.perro.tamano;
-        let cuposNecesarios = tamanoPerro === "grande" ? 4 : (tamanoPerro === "mediano" ? 2 : 1);
+        const disponibles = [];
+        const tamanoPerro = cliente.perro.tamano;
+        let cuposNecesarios;
+        if (tamanoPerro === "grande") {
+            cuposNecesarios = 4;
+        } else if (tamanoPerro === "mediano") {
+            cuposNecesarios = 2;
+        } else {
+            cuposNecesarios = 1;
+        }
         
         for (let i = 0; i < this.paseadores.length; i++) {
-            let paseador = this.paseadores[i];
-            let cuposOcupados = this.calcularCuposOcupados(paseador);
-            let cuposDisponibles = paseador.cupoMaximo - cuposOcupados;
+            const paseador = this.paseadores[i];
+            const cuposOcupados = this.calcularCuposOcupados(paseador);
+            const cuposDisponibles = paseador.cupoMaximo - cuposOcupados;
             
             // Verificar si tiene cupo suficiente
             if (cuposDisponibles >= cuposNecesarios) {
@@ -202,7 +227,7 @@ class Sistema {
     
     // Crear nueva contratación
     crearContratacion(cliente, paseador) {
-        let contratacion = new Contratacion(cliente, paseador, "pendiente");
+        const contratacion = new Contratacion(cliente, paseador, "pendiente");
         this.contrataciones.push(contratacion);
         
         // Agregar la contratación a los arreglos individuales
@@ -224,7 +249,7 @@ class Sistema {
     
     // Obtener contrataciones pendientes de un paseador
     getContratacionesPendientes(paseador) {
-        let pendientes = [];
+        const pendientes = [];
         for (let i = 0; i < this.contrataciones.length; i++) {
             if (this.contrataciones[i].paseador.id === paseador.id && this.contrataciones[i].estado === "pendiente") {
                 pendientes.push(this.contrataciones[i]);
@@ -235,29 +260,33 @@ class Sistema {
     
     // Aprobar contratación específicamente
     aprobarContratacion(contratacion) {
-        let paseador = contratacion.paseador;
-        let cliente = contratacion.cliente;
-        let tamanoPerro = cliente.perro.tamano;
-        let cuposNecesarios = tamanoPerro === "grande" ? 4 : (tamanoPerro === "mediano" ? 2 : 1);
+        const paseador = contratacion.paseador;
+        const cliente = contratacion.cliente;
+        const tamanoPerro = cliente.perro.tamano;
+        let cuposNecesarios;
+        if (tamanoPerro === "grande") {
+            cuposNecesarios = 4;
+        } else if (tamanoPerro === "mediano") {
+            cuposNecesarios = 2;
+        } else {
+            cuposNecesarios = 1;
+        }
         
         // Verificar cupo disponible
-        let cuposOcupados = this.calcularCuposOcupados(paseador);
+        const cuposOcupados = this.calcularCuposOcupados(paseador);
         if (cuposOcupados + cuposNecesarios > paseador.cupoMaximo) {
             contratacion.estado = "rechazada";
-            contratacion.motivoRechazo = "No hay cupo suficiente";
             return "No se puede aprobar: No hay cupo suficiente";
         }
         
         // Verificar compatibilidad de tamaños
         if (tamanoPerro === "chico" && this.tienePerrosGrandes(paseador)) {
             contratacion.estado = "rechazada";
-            contratacion.motivoRechazo = "Incompatible con perros grandes existentes";
             return "No se puede aprobar: Incompatible con perros grandes existentes";
         }
         
         if (tamanoPerro === "grande" && this.tienePerrosChicos(paseador)) {
             contratacion.estado = "rechazada";
-            contratacion.motivoRechazo = "Incompatible con perros chicos existentes";
             return "No se puede aprobar: Incompatible con perros chicos existentes";
         }
         
@@ -271,26 +300,31 @@ class Sistema {
     }
     
     // Rechazar contratación específicamente
-    rechazarContratacion(contratacion, motivo) {
+    rechazarContratacion(contratacion) {
         contratacion.estado = "rechazada";
-        contratacion.motivoRechazo = motivo || "Rechazada por el paseador";
         return "Contratación rechazada";
     }
     
     // Rechazar contrataciones incompatibles automáticamente
     rechazarContratacionesIncompatibles(paseador, tamanoAprobado) {
         for (let i = 0; i < this.contrataciones.length; i++) {
-            let contratacion = this.contrataciones[i];
+            const contratacion = this.contrataciones[i];
             
             if (contratacion.paseador.id === paseador.id && contratacion.estado === "pendiente") {
-                let tamanoContratacion = contratacion.cliente.perro.tamano;
-                let cuposNecesarios = tamanoContratacion === "grande" ? 4 : (tamanoContratacion === "mediano" ? 2 : 1);
+                const tamanoContratacion = contratacion.cliente.perro.tamano;
+                let cuposNecesarios;
+                if (tamanoContratacion === "grande") {
+                    cuposNecesarios = 4;
+                } else if (tamanoContratacion === "mediano") {
+                    cuposNecesarios = 2;
+                } else {
+                    cuposNecesarios = 1;
+                }
                 
                 // Verificar cupo
-                let cuposOcupados = this.calcularCuposOcupados(paseador);
+                const cuposOcupados = this.calcularCuposOcupados(paseador);
                 if (cuposOcupados + cuposNecesarios > paseador.cupoMaximo) {
                     contratacion.estado = "rechazada";
-                    contratacion.motivoRechazo = "No hay cupo suficiente";
                     continue;
                 }
                 
@@ -298,7 +332,6 @@ class Sistema {
                 if ((tamanoAprobado === "grande" && tamanoContratacion === "chico") ||
                     (tamanoAprobado === "chico" && tamanoContratacion === "grande")) {
                     contratacion.estado = "rechazada";
-                    contratacion.motivoRechazo = "Incompatible con perro " + tamanoAprobado + " aprobado";
                 }
             }
         }
@@ -306,7 +339,7 @@ class Sistema {
     
     // Obtener perros asignados a un paseador
     getPerrosAsignados(paseador) {
-        let perros = [];
+        const perros = [];
         for (let i = 0; i < this.contrataciones.length; i++) {
             if (this.contrataciones[i].paseador.id === paseador.id && this.contrataciones[i].estado === "aprobada") {
                 perros.push(this.contrataciones[i].cliente.perro);
@@ -317,10 +350,10 @@ class Sistema {
     
     // Obtener información de todos los paseadores para cliente
     getInfoPaseadores() {
-        let info = [];
+        const info = [];
         for (let i = 0; i < this.paseadores.length; i++) {
-            let paseador = this.paseadores[i];
-            let perrosAsignados = this.getPerrosAsignados(paseador);
+            const paseador = this.paseadores[i];
+            const perrosAsignados = this.getPerrosAsignados(paseador);
             info.push({
                 nombre: paseador.username,
                 cantidadPerros: perrosAsignados.length

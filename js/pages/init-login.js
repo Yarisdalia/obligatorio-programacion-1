@@ -28,7 +28,7 @@ function onHandleLogin() {
         return;
     }
 
-    let resultado = sistema.login(username, password);
+    const resultado = sistema.login(username, password);
     
     if (resultado === "ok") {
         if (sistema.userLogged.rol === "paseador") {

@@ -1,43 +1,53 @@
 function initDashboardCliente() {
-    let cliente = sistema.userLogged;
+    const cliente = sistema.userLogged;
     
-    // Mostrar información del cliente y su perro
+    // Mostrar información del cliente
     document.querySelector("#nombreCliente").innerHTML = cliente.nombre;
     document.querySelector("#nombrePerro").innerHTML = cliente.perro.nombre;
     document.querySelector("#tamanoPerro").innerHTML = cliente.perro.tamano;
     
-    // Configurar botones de navegación
+    // Configurar botón de logout
     document.querySelector("#btnLogoutCliente").addEventListener("click", function() {
         sistema.userLogged = null;
         navigateTo("login", initLogin);
     });
     
-    document.querySelector("#btnContratarServicio").addEventListener("click", mostrarContratarServicio);
-    document.querySelector("#btnVerContratacion").addEventListener("click", mostrarVerContratacion);
-    document.querySelector("#btnInfoPaseadores").addEventListener("click", mostrarInfoPaseadores);
+    document.querySelector("#btnContratarServicio").addEventListener("click", mostrarPanelContratarServicio);
+    document.querySelector("#btnVerContratacion").addEventListener("click", mostrarPanelVerContratacion);
+    document.querySelector("#btnInfoPaseadores").addEventListener("click", mostrarPanelInfoPaseadores);
     
     // Mostrar contratar servicio por defecto
-    mostrarContratarServicio();
+    mostrarPanelContratarServicio();
 }
 
-function mostrarContratarServicio() {
-    let contenido = document.querySelector("#contenidoCliente");
-    let cliente = sistema.userLogged;
+function mostrarPanelContratarServicio() {
+    const contenido = document.querySelector("#contenidoPanelCliente");
+    const cliente = sistema.userLogged;
     
     // Verificar si ya tiene una contratación actual (pendiente o aprobada)
-    let contratacionActual = sistema.getContratacionActual(cliente);
+    const contratacionActual = sistema.getContratacionActual(cliente);
     
     if (contratacionActual) {
         // Usar template de estado de contratación
-        let template = document.querySelector("#cliente-contratacion-estado");
+        const template = document.querySelector("#cliente-contratacion-estado");
         contenido.innerHTML = template.innerHTML;
         
         // Configurar clases y datos
-        let estadoClass = contratacionActual.estado === "aprobada" ? "bg-success" : "bg-warning";
-        let estadoBadge = contratacionActual.estado === "aprobada" ? "bg-success" : "bg-warning";
-        let mensaje = contratacionActual.estado === "aprobada" ? 
-            "¡Tu contratación ha sido aprobada! Tu perro ya está siendo paseado." :
-            "Tienes una contratación pendiente. Debes esperar a que el paseador la apruebe o rechace.";
+        let estadoClass;
+        let estadoBadge;
+        if (contratacionActual.estado === "aprobada") {
+            estadoClass = "bg-success";
+            estadoBadge = "bg-success";
+        } else {
+            estadoClass = "bg-warning";
+            estadoBadge = "bg-warning";
+        }
+        let mensaje;
+        if (contratacionActual.estado === "aprobada") {
+            mensaje = "¡Tu contratación ha sido aprobada! Tu perro ya está siendo paseado.";
+        } else {
+            mensaje = "Tienes una contratación pendiente. Debes esperar a que el paseador la apruebe o rechace.";
+        }
         
         document.querySelector("#estadoClass").className = "card-header " + estadoClass;
         document.querySelector("#nombrePaseadorContrato").innerHTML = contratacionActual.paseador.nombre;
@@ -57,41 +67,41 @@ function mostrarContratarServicio() {
     }
     
     // Usar template de contratar servicio
-    let template = document.querySelector("#cliente-contratar-servicio");
+    const template = document.querySelector("#cliente-contratar-servicio");
     contenido.innerHTML = template.innerHTML;
     
     // Obtener paseadores disponibles
-    let paseadoresDisponibles = sistema.getPaseadoresDisponibles(cliente);
-    let contenidoContratacion = document.querySelector("#contenidoContratacion");
+    const paseadoresDisponibles = sistema.getPaseadoresDisponibles(cliente);
+    const contenidoContratacion = document.querySelector("#contenidoContratacion");
     
     if (paseadoresDisponibles.length === 0) {
         // Usar template de sin paseadores
-        let templateSin = document.querySelector("#cliente-sin-paseadores");
+        const templateSin = document.querySelector("#cliente-sin-paseadores");
         contenidoContratacion.innerHTML = templateSin.innerHTML;
         document.querySelector("#tamanoPerroSin").innerHTML = cliente.perro.tamano;
     } else {
         // Usar template de formulario
-        let templateForm = document.querySelector("#cliente-form-paseador");
+        const templateForm = document.querySelector("#cliente-form-paseador");
         contenidoContratacion.innerHTML = templateForm.innerHTML;
         
         // Llenar el select con paseadores
-        let select = document.querySelector("#selectPaseador");
+        const select = document.querySelector("#selectPaseador");
         for (let i = 0; i < paseadoresDisponibles.length; i++) {
-            let paseador = paseadoresDisponibles[i];
-            let cuposOcupados = sistema.calcularCuposOcupados(paseador);
-            let cuposDisponibles = paseador.cupoMaximo - cuposOcupados;
-            let option = document.createElement("option");
+            const paseador = paseadoresDisponibles[i];
+            const cuposOcupados = sistema.calcularCuposOcupados(paseador);
+            const cuposDisponibles = paseador.cupoMaximo - cuposOcupados;
+            const option = document.createElement("option");
             option.value = paseador.id;
             option.innerHTML = paseador.username + " (Cupos disponibles: " + cuposDisponibles + "/" + paseador.cupoMaximo + ")";
             select.appendChild(option);
         }
         
         // Configurar botón de solicitar contratación
-        let btnSolicitar = document.querySelector("#btnSolicitarContratacion");
+        const btnSolicitar = document.querySelector("#btnSolicitarContratacion");
         btnSolicitar.addEventListener("click", function() {
-            let selectPaseador = document.querySelector("#selectPaseador");
-            let paseadorId = selectPaseador.value;
-            let mensaje = document.querySelector("#mensajeContratacion");
+            const selectPaseador = document.querySelector("#selectPaseador");
+            const paseadorId = selectPaseador.value;
+            const mensaje = document.querySelector("#mensajeContratacion");
             
             if (paseadorId === "") {
                 mostrarMensaje(mensaje, "danger", "Por favor selecciona un paseador");
@@ -119,30 +129,39 @@ function mostrarContratarServicio() {
     }
 }
 
-function mostrarVerContratacion() {
-    let contenido = document.querySelector("#contenidoCliente");
-    let cliente = sistema.userLogged;
+function mostrarPanelVerContratacion() {
+    const contenido = document.querySelector("#contenidoPanelCliente");
+    const cliente = sistema.userLogged;
     
     // Usar template de ver contratación
-    let template = document.querySelector("#cliente-ver-contratacion");
+    const template = document.querySelector("#cliente-ver-contratacion");
     contenido.innerHTML = template.innerHTML;
     
     // Buscar contratación actual (pendiente o aprobada)
-    let contratacionActual = sistema.getContratacionActual(cliente);
-    let contenidoMiContratacion = document.querySelector("#contenidoMiContratacion");
+    const contratacionActual = sistema.getContratacionActual(cliente);
+    const contenidoMiContratacion = document.querySelector("#contenidoMiContratacion");
     
     if (!contratacionActual) {
         // Usar template sin contratación
-        let templateSin = document.querySelector("#cliente-sin-contratacion");
+        const templateSin = document.querySelector("#cliente-sin-contratacion");
         contenidoMiContratacion.innerHTML = templateSin.innerHTML;
     } else {
         // Usar template de detalles
-        let templateDetalles = document.querySelector("#cliente-detalles-contratacion");
+        const templateDetalles = document.querySelector("#cliente-detalles-contratacion");
         contenidoMiContratacion.innerHTML = templateDetalles.innerHTML;
         
-        let alertClass = contratacionActual.estado === "aprobada" ? "alert-success" : "alert-warning";
-        let badgeClass = contratacionActual.estado === "aprobada" ? "bg-success" : "bg-warning";
-        let titulo = contratacionActual.estado === "aprobada" ? "Contratación Aprobada" : "Contratación Pendiente";
+        let alertClass;
+        let badgeClass;
+        let titulo;
+        if (contratacionActual.estado === "aprobada") {
+            alertClass = "alert-success";
+            badgeClass = "bg-success";
+            titulo = "Contratación Aprobada";
+        } else {
+            alertClass = "alert-warning";
+            badgeClass = "bg-warning";
+            titulo = "Contratación Pendiente";
+        }
         
         document.querySelector("#alertContratacion").className = "alert " + alertClass;
         document.querySelector("#tituloContratacion").innerHTML = titulo;
@@ -159,7 +178,7 @@ function mostrarVerContratacion() {
         }
         
         // Configurar botones según el estado usando la función auxiliar
-        let botonesDiv = document.querySelector("#botonesContratacion");
+        const botonesDiv = document.querySelector("#botonesContratacion");
         if (contratacionActual.estado === "pendiente") {
             botonesDiv.innerHTML = '<button id="btnCancelarContratacion" class="btn btn-danger">Cancelar Contratación</button>';
         } else {
@@ -168,11 +187,11 @@ function mostrarVerContratacion() {
         }
         
         // Configurar eventos de botones (solo cancelar si está pendiente)
-        let btnCancelar = document.querySelector("#btnCancelarContratacion");
+        const btnCancelar = document.querySelector("#btnCancelarContratacion");
         if (btnCancelar && contratacionActual.estado === "pendiente") {
             btnCancelar.addEventListener("click", function() {
                 sistema.cancelarContratacion(contratacionActual);
-                let mensaje = document.querySelector("#mensajeCancelacion");
+                const mensaje = document.querySelector("#mensajeCancelacion");
                 mostrarMensaje(mensaje, "success", "Contratación cancelada exitosamente.");
                 
                 // Recargar la vista inmediatamente
@@ -182,23 +201,21 @@ function mostrarVerContratacion() {
     }
 }
 
-function mostrarInfoPaseadores() {
-    let contenido = document.querySelector("#contenidoCliente");
-    let infoPaseadores = sistema.getInfoPaseadores();
+function mostrarPanelInfoPaseadores() {
+    const contenido = document.querySelector("#contenidoPanelCliente");
+    const infoPaseadores = sistema.getInfoPaseadores();
     
     // Usar template de información de paseadores
-    let template = document.querySelector("#cliente-info-paseadores");
+    const template = document.querySelector("#cliente-info-paseadores");
     contenido.innerHTML = template.innerHTML;
     
     // Llenar la tabla
-    let tbody = document.querySelector("#tablaPaseadores");
+    const tbody = document.querySelector("#tablaPaseadores");
     for (let i = 0; i < infoPaseadores.length; i++) {
-        let info = infoPaseadores[i];
-        let row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${info.nombre}</td>
-            <td>${info.cantidadPerros}</td>
-        `;
+        const info = infoPaseadores[i];
+        const row = document.createElement("tr");
+        row.innerHTML = '<td>' + info.nombre + '</td>' +
+            '<td>' + info.cantidadPerros + '</td>';
         tbody.appendChild(row);
     }
 } 
