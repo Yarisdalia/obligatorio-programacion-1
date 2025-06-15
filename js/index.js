@@ -80,43 +80,33 @@ const contratacion10 = new Contratacion(cliente19, paseador2, "aprobada"); // ra
 
 // Agregar contrataciones al sistema y a los arreglos individuales de clientes y paseadores
 sistema.agregarContratacion(contratacion1);
-cliente15.agregarContratacion(contratacion1);
 paseador2.agregarContratacion(contratacion1);
 
 sistema.agregarContratacion(contratacion2);
-cliente6.agregarContratacion(contratacion2);
 paseador2.agregarContratacion(contratacion2);
 
 sistema.agregarContratacion(contratacion3);
-cliente20.agregarContratacion(contratacion3);
 paseador2.agregarContratacion(contratacion3);
 
 sistema.agregarContratacion(contratacion4);
-cliente11.agregarContratacion(contratacion4);
 paseador2.agregarContratacion(contratacion4);
 
 sistema.agregarContratacion(contratacion5);
-cliente9.agregarContratacion(contratacion5);
 paseador2.agregarContratacion(contratacion5);
 
 sistema.agregarContratacion(contratacion6);
-cliente3.agregarContratacion(contratacion6);
 paseador2.agregarContratacion(contratacion6);
 
 sistema.agregarContratacion(contratacion7);
-cliente4.agregarContratacion(contratacion7);
 paseador2.agregarContratacion(contratacion7);
 
 sistema.agregarContratacion(contratacion8);
-cliente14.agregarContratacion(contratacion8);
 paseador2.agregarContratacion(contratacion8);
 
 sistema.agregarContratacion(contratacion9);
-cliente2.agregarContratacion(contratacion9);
 paseador2.agregarContratacion(contratacion9);
 
 sistema.agregarContratacion(contratacion10);
-cliente19.agregarContratacion(contratacion10);
 paseador2.agregarContratacion(contratacion10);
 
 // ------------------------------ CONTRATACIONES ------------------------------

@@ -8,11 +8,9 @@ function initLogin() {
         errorDiv.innerHTML = "";
     }
     
-    const btnLogin = document.querySelector("#btnLogin");
-    btnLogin.addEventListener("click", onHandleLogin);
-
-    const goToRegister = document.querySelector("#goToRegister");
-    goToRegister.addEventListener("click", onGoToRegister);
+    document.querySelector("#btnLogin").addEventListener("click", onHandleLogin);
+    
+    document.querySelector("#goToRegister").addEventListener("click", onGoToRegister);
 }
 
 function onHandleLogin() {

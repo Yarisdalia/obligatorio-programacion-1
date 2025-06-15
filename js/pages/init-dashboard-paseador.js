@@ -4,174 +4,218 @@ function initDashboardPaseador() {
     // Mostrar información del paseador
     document.querySelector("#nombrePaseador").innerHTML = paseador.nombre;
     
-    // Configurar botón de logout
+    // Configurar logout
     document.querySelector("#btnLogoutPaseador").addEventListener("click", function() {
         sistema.userLogged = null;
         navigateTo("login", initLogin);
     });
     
-    // Configurar botones de navegación
-    document.querySelector("#btnContratacionesPendientes").addEventListener("click", mostrarContratacionesPendientes);
-    document.querySelector("#btnPerrosAsignados").addEventListener("click", mostrarPerrosAsignados);
+    // Configurar navegación
+    document.querySelector("#btnContratacionesPendientes").addEventListener("click", function() {
+        setActiveButton("btnContratacionesPendientes");
+        mostrarContratacionesPendientes();
+    });
+    document.querySelector("#btnPerrosAsignados").addEventListener("click", function() {
+        setActiveButton("btnPerrosAsignados");
+        mostrarPerrosAsignados();
+    });
     
-    // Mostrar contrataciones pendientes por defecto
+    // Mostrar pendientes por defecto
+    setActiveButton("btnContratacionesPendientes");
     mostrarContratacionesPendientes();
+}
+
+function setActiveButton(activeButtonId) {
+    document.querySelectorAll(".btn-nav").forEach(btn => {
+        if (btn.id !== "btnLogoutPaseador") {
+            btn.classList.remove("active");
+        }
+    });
+    document.querySelector("#" + activeButtonId).classList.add("active");
 }
 
 function mostrarContratacionesPendientes() {
     const contenido = document.querySelector("#contenidoPanelPaseador");
     const paseador = sistema.userLogged;
+    const pendientes = sistema.getContratacionesPendientes(paseador);
     
-    // Usar template de contrataciones pendientes
-    const template = document.querySelector("#paseador-contrataciones-pendientes");
-    contenido.innerHTML = template.innerHTML;
+    // Calcular estadísticas de cupos
+    const cuposOcupados = sistema.calcularCuposOcupados(paseador);
+    const cuposMaximos = paseador.cupoMaximo;
+    const porcentajeOcupacion = cuposMaximos > 0 ? ((cuposOcupados / cuposMaximos) * 100).toFixed(1) : 0;
     
-    // Obtener contrataciones pendientes
-    const contratacionesPendientes = sistema.getContratacionesPendientes(paseador);
-    const contenidoContratacionesPendientes = document.querySelector("#contenidoContratacionesPendientes");
-    
-    if (contratacionesPendientes.length === 0) {
-        // Usar template sin contrataciones pendientes
-        const templateSin = document.querySelector("#paseador-sin-pendientes");
-        contenidoContratacionesPendientes.innerHTML = templateSin.innerHTML;
-    } else {
-        // Usar template de tabla de contrataciones pendientes
-        const templateTabla = document.querySelector("#paseador-tabla-pendientes");
-        contenidoContratacionesPendientes.innerHTML = templateTabla.innerHTML;
+    let html = `
+        <div class="content-title">Contrataciones Pendientes</div>
         
-        // Llenar la tabla
-        const tbody = document.querySelector("#tablaContratacionesPendientes");
-        for (let i = 0; i < contratacionesPendientes.length; i++) {
-            const contratacion = contratacionesPendientes[i];
+        <!-- Estadísticas de Cupos -->
+        <div class="stats-container" style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div class="stat-card" style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; flex: 1;">
+                <h5>Cupos Ocupados</h5>
+                <p style="font-size: 24px; font-weight: bold; color: #dc3545; margin: 0;">${cuposOcupados}</p>
+            </div>
+            <div class="stat-card" style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; flex: 1;">
+                <h5>Cupos Máximos</h5>
+                <p style="font-size: 24px; font-weight: bold; color: #007bff; margin: 0;">${cuposMaximos}</p>
+            </div>
+            <div class="stat-card" style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; flex: 1;">
+                <h5>% Ocupación</h5>
+                <p style="font-size: 24px; font-weight: bold; color: #28a745; margin: 0;">${porcentajeOcupacion}%</p>
+            </div>
+        </div>
+        
+        <div id="mensajeProcesamiento"></div>
+    `;
+    
+    if (pendientes.length === 0) {
+        html += '<div class="alert alert-info">No tienes contrataciones pendientes.</div>';
+    } else {
+        html += `
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Perro</th>
+                        <th>Tamaño</th>
+                        <th>Cupos Necesarios</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        for (let i = 0; i < pendientes.length; i++) {
+            const contratacion = pendientes[i];
+            const tamano = contratacion.cliente.perro.tamano;
             let cuposNecesarios;
-            if (contratacion.cliente.perro.tamano === "grande") {
+            if (tamano === "grande") {
                 cuposNecesarios = 4;
-            } else if (contratacion.cliente.perro.tamano === "mediano") {
+            } else if (tamano === "mediano") {
                 cuposNecesarios = 2;
             } else {
                 cuposNecesarios = 1;
             }
             
-            const row = document.createElement("tr");
-            row.innerHTML = '<td>' + contratacion.id + '</td>' +
-                '<td>' + contratacion.cliente.username + '</td>' +
-                '<td>' + contratacion.cliente.perro.nombre + '</td>' +
-                '<td>' + contratacion.cliente.perro.tamano + '</td>' +
-                '<td>' + cuposNecesarios + '</td>' +
-                '<td>' +
-                    '<button class="btn btn-success btn-sm" onclick="aprobarContratacion(' + contratacion.id + ')">' +
-                        'Aprobar' +
-                    '</button>' +
-                    '<button class="btn btn-danger btn-sm ms-1" onclick="rechazarContratacion(' + contratacion.id + ')">' +
-                        'Rechazar' +
-                    '</button>' +
-                '</td>';
-            tbody.appendChild(row);
+            html += `
+                <tr>
+                    <td>${contratacion.cliente.nombre}</td>
+                    <td>${contratacion.cliente.perro.nombre}</td>
+                    <td>${tamano}</td>
+                    <td>${cuposNecesarios}</td>
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="aprobarContratacion(${contratacion.id})">Aprobar</button>
+                        <button class="btn btn-danger btn-sm" onclick="rechazarContratacion(${contratacion.id})">Rechazar</button>
+                    </td>
+                </tr>
+            `;
         }
+        
+        html += '</tbody></table>';
     }
+    
+    contenido.innerHTML = html;
 }
 
 function aprobarContratacion(contratacionId) {
-    const mensaje = document.querySelector("#mensajeProcesamiento");
-    
-    // Buscar la contratación
-    let contratacion = null;
-    for (let i = 0; i < sistema.contrataciones.length; i++) {
-        if (sistema.contrataciones[i].id === contratacionId) {
-            contratacion = sistema.contrataciones[i];
-            break;
-        }
+    const contratacion = encontrarContratacion(contratacionId);
+    if (contratacion) {
+        sistema.aprobarContratacion(contratacion);
+        const mensaje = document.querySelector("#mensajeProcesamiento");
+        mostrarMensaje(mensaje, "success", "Contratación aprobada");
+        mostrarContratacionesPendientes();
     }
-    
-    if (!contratacion) {
-        mostrarMensaje(mensaje, "danger", "Contratación no encontrada");
-        return;
-    }
-    
-    // Aprobar la contratación
-    const resultado = sistema.aprobarContratacion(contratacion);
-    
-    if (contratacion.estado === "aprobada") {
-        mostrarMensaje(mensaje, "success", resultado + ". Se han rechazado automáticamente las contrataciones incompatibles.");
-    } else {
-        mostrarMensaje(mensaje, "warning", resultado);
-    }
-    
-    // Recargar la vista inmediatamente
-    mostrarContratacionesPendientes();
 }
 
 function rechazarContratacion(contratacionId) {
-    const mensaje = document.querySelector("#mensajeProcesamiento");
-    
-    // Buscar la contratación
-    let contratacion = null;
+    const contratacion = encontrarContratacion(contratacionId);
+    if (contratacion) {
+        sistema.rechazarContratacion(contratacion);
+        const mensaje = document.querySelector("#mensajeProcesamiento");
+        mostrarMensaje(mensaje, "info", "Contratación rechazada");
+        mostrarContratacionesPendientes();
+    }
+}
+
+function encontrarContratacion(id) {
     for (let i = 0; i < sistema.contrataciones.length; i++) {
-        if (sistema.contrataciones[i].id === contratacionId) {
-            contratacion = sistema.contrataciones[i];
-            break;
+        if (sistema.contrataciones[i].id == id) {
+            return sistema.contrataciones[i];
         }
     }
-    
-    if (!contratacion) {
-        mostrarMensaje(mensaje, "danger", "Contratación no encontrada");
-        return;
-    }
-    
-    sistema.rechazarContratacion(contratacion);
-    
-    // Recargar la vista inmediatamente
-    mostrarContratacionesPendientes();
+    return null;
 }
 
 function mostrarPerrosAsignados() {
     const contenido = document.querySelector("#contenidoPanelPaseador");
     const paseador = sistema.userLogged;
+    const asignados = sistema.getPerrosAsignados(paseador);
     
-    // Usar template de perros asignados
-    const template = document.querySelector("#paseador-perros-asignados");
-    contenido.innerHTML = template.innerHTML;
-    
-    // Obtener datos del paseador
-    const perrosAsignados = sistema.getPerrosAsignados(paseador);
+    // Calcular estadísticas de cupos
     const cuposOcupados = sistema.calcularCuposOcupados(paseador);
-    const porcentajeOcupacion = ((cuposOcupados / paseador.cupoMaximo) * 100).toFixed(1);
+    const cuposMaximos = paseador.cupoMaximo;
+    const porcentajeOcupacion = cuposMaximos > 0 ? ((cuposOcupados / cuposMaximos) * 100).toFixed(1) : 0;
     
-    // Actualizar estadísticas
-    document.querySelector("#cuposOcupados").innerHTML = cuposOcupados;
-    document.querySelector("#cuposMaximos").innerHTML = paseador.cupoMaximo;
-    document.querySelector("#porcentajeOcupacion").innerHTML = porcentajeOcupacion + "%";
-    
-    // Mostrar contenido de perros
-    const contenidoPerros = document.querySelector("#contenidoPerros");
-    
-    if (perrosAsignados.length === 0) {
-        // Usar template sin perros
-        const templateSin = document.querySelector("#paseador-sin-perros");
-        contenidoPerros.innerHTML = templateSin.innerHTML;
-    } else {
-        // Usar template de tabla de perros
-        const templateTabla = document.querySelector("#paseador-tabla-perros");
-        contenidoPerros.innerHTML = templateTabla.innerHTML;
+    let html = `
+        <div class="content-title">Mis Perros Asignados</div>
         
-        // Llenar la tabla
-        const tbody = document.querySelector("#tablaPerrosAsignados");
-        for (let i = 0; i < perrosAsignados.length; i++) {
-            const perro = perrosAsignados[i];
+        <!-- Estadísticas de Cupos -->
+        <div class="stats-container" style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div class="stat-card" style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; flex: 1;">
+                <h5>Cupos Ocupados</h5>
+                <p style="font-size: 24px; font-weight: bold; color: #dc3545; margin: 0;">${cuposOcupados}</p>
+            </div>
+            <div class="stat-card" style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; flex: 1;">
+                <h5>Cupos Máximos</h5>
+                <p style="font-size: 24px; font-weight: bold; color: #007bff; margin: 0;">${cuposMaximos}</p>
+            </div>
+            <div class="stat-card" style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; flex: 1;">
+                <h5>% Ocupación</h5>
+                <p style="font-size: 24px; font-weight: bold; color: #28a745; margin: 0;">${porcentajeOcupacion}%</p>
+            </div>
+        </div>
+        
+        <div class="alert alert-info">Total de perros: ${asignados.length}</div>
+    `;
+    
+    if (asignados.length === 0) {
+        html += '<div class="alert alert-info">No tienes perros asignados actualmente.</div>';
+    } else {
+        html += `
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Perro</th>
+                        <th>Tamaño</th>
+                        <th>Cupos que Ocupa</th>
+                        <th>Dueño</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        for (let i = 0; i < asignados.length; i++) {
+            const contratacion = asignados[i];
+            const tamano = contratacion.cliente.perro.tamano;
             let cuposPerro;
-            if (perro.tamano === "grande") {
+            if (tamano === "grande") {
                 cuposPerro = 4;
-            } else if (perro.tamano === "mediano") {
+            } else if (tamano === "mediano") {
                 cuposPerro = 2;
             } else {
                 cuposPerro = 1;
             }
             
-            const row = document.createElement("tr");
-            row.innerHTML = '<td>' + perro.nombre + '</td>' +
-                '<td>' + perro.tamano + '</td>' +
-                '<td>' + cuposPerro + '</td>';
-            tbody.appendChild(row);
+            html += `
+                <tr>
+                    <td>${contratacion.cliente.perro.nombre}</td>
+                    <td>${tamano}</td>
+                    <td>${cuposPerro}</td>
+                    <td>${contratacion.cliente.nombre}</td>
+                </tr>
+            `;
         }
+        
+        html += '</tbody></table>';
     }
+    
+    contenido.innerHTML = html;
 } 
