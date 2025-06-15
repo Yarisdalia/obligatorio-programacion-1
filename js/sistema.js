@@ -176,11 +176,65 @@ class Sistema {
         return pendientes;
     }
     
-    // Aprobar contratación
+    // Validar si se puede aprobar una contratación
+    puedeAprobarContratacion(contratacion) {
+        const paseador = contratacion.paseador;
+        const tamanoPerro = contratacion.cliente.perro.tamano;
+        
+        // Determinar cuántos cupos necesita el perro según su tamaño
+        let cuposNecesarios = 0;
+        if (tamanoPerro === "grande") {
+            cuposNecesarios = 4;
+        } else if (tamanoPerro === "mediano") {
+            cuposNecesarios = 2;
+        } else if (tamanoPerro === "chico") {
+            cuposNecesarios = 1;
+        }
+        
+        // Verificar cupos disponibles
+        const cuposOcupados = this.calcularCuposOcupados(paseador);
+        const cuposDisponibles = paseador.cupoMaximo - cuposOcupados;
+        
+        if (cuposDisponibles < cuposNecesarios) {
+            return {
+                puede: false,
+                motivo: `No tienes suficientes cupos disponibles. Necesitas ${cuposNecesarios} cupos pero solo tienes ${cuposDisponibles} disponibles.`
+            };
+        }
+        
+        // Verificar compatibilidad con perros ya asignados
+        const perrosAsignados = this.getPerrosAsignados(paseador);
+        for (let i = 0; i < perrosAsignados.length; i++) {
+            const tamanoAsignado = perrosAsignados[i].cliente.perro.tamano;
+            
+            // Si el cliente tiene perro chico y el paseador ya tiene perros grandes, no es compatible
+            if (tamanoPerro === "chico" && tamanoAsignado === "grande") {
+                return {
+                    puede: false,
+                    motivo: "No se puede aceptar: Los perros chicos no pueden estar con perros grandes por incompatibilidad de tamaños."
+                };
+            }
+            
+            // Si el cliente tiene perro grande y el paseador ya tiene perros chicos, no es compatible
+            if (tamanoPerro === "grande" && tamanoAsignado === "chico") {
+                return {
+                    puede: false,
+                    motivo: "No se puede aceptar: Los perros grandes no pueden estar con perros chicos por incompatibilidad de tamaños."
+                };
+            }
+        }
+        
+        return {
+            puede: true,
+            motivo: "Contratación aprobada"
+        };
+    }
+
+        // Aprobar contratación
     aprobarContratacion(contratacion) {
         contratacion.estado = "aprobada";
     }
-    
+
     // Rechazar contratación
     rechazarContratacion(contratacion) {
         contratacion.estado = "rechazada";
@@ -245,9 +299,3 @@ class Sistema {
     }
 }
 
-// Función simple para mostrar mensajes
-function mostrarMensaje(elemento, tipo, mensaje) {
-    elemento.className = `alert alert-${tipo}`;
-    elemento.innerHTML = mensaje;
-    elemento.style.display = "block";
-}

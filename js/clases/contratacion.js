@@ -5,6 +5,6 @@ class Contratacion {
         this.id = idCounter++;
         this.cliente = cliente;
         this.paseador = paseador;
-        this.estado = estado || "pendiente"; // pendiente, aprobada, cancelada
+        this.estado = estado || "pendiente"; // pendiente, aprobada, cancelada, rechazada
     }
 }

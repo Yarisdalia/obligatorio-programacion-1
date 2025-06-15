@@ -118,10 +118,27 @@ function mostrarContratacionesPendientes() {
 function aprobarContratacion(contratacionId) {
     const contratacion = encontrarContratacion(contratacionId);
     if (contratacion) {
-        sistema.aprobarContratacion(contratacion);
-        const mensaje = document.querySelector("#mensajeProcesamiento");
-        mostrarMensaje(mensaje, "success", "Contratación aprobada");
+        // Validar si se puede aprobar la contratación
+        const validacion = sistema.puedeAprobarContratacion(contratacion);
+        
+        if (validacion.puede) {
+            // Se puede aprobar - proceder normalmente
+            sistema.aprobarContratacion(contratacion);
+        } else {
+            // No se puede aprobar - rechazar automáticamente
+            sistema.rechazarContratacion(contratacion);
+        }
+        
+        // Actualizar la lista primero
         mostrarContratacionesPendientes();
+        
+        // Luego mostrar el mensaje
+        const mensaje = document.querySelector("#mensajeProcesamiento");
+        if (validacion.puede) {
+            mostrarMensaje(mensaje, "success", validacion.motivo);
+        } else {
+            mostrarMensaje(mensaje, "warning", validacion.motivo);
+        }
     }
 }
 
@@ -129,9 +146,13 @@ function rechazarContratacion(contratacionId) {
     const contratacion = encontrarContratacion(contratacionId);
     if (contratacion) {
         sistema.rechazarContratacion(contratacion);
+        
+        // Actualizar la lista primero
+        mostrarContratacionesPendientes();
+        
+        // Luego mostrar el mensaje
         const mensaje = document.querySelector("#mensajeProcesamiento");
         mostrarMensaje(mensaje, "info", "Contratación rechazada");
-        mostrarContratacionesPendientes();
     }
 }
 
