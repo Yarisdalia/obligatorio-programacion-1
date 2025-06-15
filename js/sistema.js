@@ -36,8 +36,26 @@ class Sistema {
             return "El nombre de usuario ya existe";
         }
         
-        if (password.length < 4) {
-            return "La contraseña debe tener al menos 4 caracteres";
+        if (password.length < 5) {
+            return "La contraseña debe tener al menos 5 caracteres";
+        }
+
+        let tieneMayuscula = false;
+        let tieneMinuscula = false;
+        let tieneNumero = false;
+        
+        for (let i = 0; i < password.length; i++) {
+            if (password[i] >= 'A' && password[i] <= 'Z') {
+                tieneMayuscula = true;
+            } else if (password[i] >= 'a' && password[i] <= 'z') {
+                tieneMinuscula = true;
+            } else if (password[i] >= '0' && password[i] <= '9') {
+                tieneNumero = true;
+            }
+        }
+
+        if (!tieneMayuscula || !tieneMinuscula || !tieneNumero) {
+            return "La contraseña debe tener al menos una mayúscula, una minúscula y un número";
         }
         
         // Crear perro y cliente
