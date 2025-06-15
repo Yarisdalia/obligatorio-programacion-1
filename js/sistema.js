@@ -89,9 +89,57 @@ class Sistema {
         return "Usuario o contraseña incorrectos";
     }
     
-    // Obtener todos los paseadores (simplificado - sin restricciones)
-    getPaseadoresDisponibles() {
-        return this.paseadores;
+    getPaseadoresDisponibles(cliente) {
+        // Obtener todos los paseadores compatible con el perro del cliente y que tengan cupos disponibles para el tamaño del perro
+        const paseadoresDisponibles = [];
+        const tamanoPerro = cliente.perro.tamano;
+        
+        // Determinar cuántos cupos necesita el perro según su tamaño
+        let cuposNecesarios = 0;
+        if (tamanoPerro === "grande") {
+            cuposNecesarios = 4;
+        } else if (tamanoPerro === "mediano") {
+            cuposNecesarios = 2;
+        } else if (tamanoPerro === "chico") {
+            cuposNecesarios = 1;
+        }
+        
+        // Revisar cada paseador para ver si tiene cupos disponibles y es compatible
+        for (let i = 0; i < this.paseadores.length; i++) {
+            const paseador = this.paseadores[i];
+            const cuposOcupados = this.calcularCuposOcupados(paseador);
+            const cuposDisponibles = paseador.cupoMaximo - cuposOcupados;
+            
+            // Verificar si tiene suficientes cupos disponibles
+            if (cuposDisponibles >= cuposNecesarios) {
+                // Verificar compatibilidad con perros ya asignados
+                const perrosAsignados = this.getPerrosAsignados(paseador);
+                let esCompatible = true;
+                
+                for (let j = 0; j < perrosAsignados.length; j++) {
+                    const tamanoAsignado = perrosAsignados[j].cliente.perro.tamano;
+                    
+                    // Si el cliente tiene perro chico y el paseador ya tiene perros grandes, no es compatible
+                    if (tamanoPerro === "chico" && tamanoAsignado === "grande") {
+                        esCompatible = false;
+                        break;
+                    }
+                    
+                    // Si el cliente tiene perro grande y el paseador ya tiene perros chicos, no es compatible
+                    if (tamanoPerro === "grande" && tamanoAsignado === "chico") {
+                        esCompatible = false;
+                        break;
+                    }
+                }
+                
+                // Si el paseador es compatible, agregarlo a la lista
+                if (esCompatible) {
+                    paseadoresDisponibles.push(paseador);
+                }
+            }
+        }
+        
+        return paseadoresDisponibles;
     }
     
     // Verificar si cliente tiene contratación activa
@@ -108,6 +156,7 @@ class Sistema {
     // Crear contratación
     crearContratacion(cliente, paseador) {
         const contratacion = new Contratacion(cliente, paseador);
+        paseador.agregarContratacion(contratacion);
         this.contrataciones.push(contratacion);
     }
     

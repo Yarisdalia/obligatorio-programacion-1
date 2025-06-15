@@ -82,7 +82,7 @@ function mostrarPanelContratacion() {
         
         // Llenar select con paseadores
         const select = document.querySelector("#selectPaseador");
-        const paseadores = sistema.getPaseadoresDisponibles();
+        const paseadores = sistema.getPaseadoresDisponibles(cliente);
         for (let i = 0; i < paseadores.length; i++) {
             const option = document.createElement("option");
             option.value = paseadores[i].id;
