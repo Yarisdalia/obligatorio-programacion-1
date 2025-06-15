@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nubbi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/register.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/dashboard-cliente.css">
+    <link rel="stylesheet" href="css/dashboard-paseador.css">
+</head>
+
+<body>
+
+    <!-- Donde se van a montar los templates -->
+    <main id="app"></main>
+
+    <!-- Template de Login -->
+    <template id="login">
+        <div class="F02">
+            <h2>Nubbi: Iniciar Sesión</h2>
+            <div id="loginForm">
+                <div class="form-group">
+                    <p id="loginError" style="color: red;"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputUser">Usuario</label>
+                    <input type="text" id="inputUser" class="form-control" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" class="form-control" required />
+                </div>
+
+                <button type="button" id="btnLogin" class="btn btn-primary">Ingresar</button>
+            </div>
+            <p style="text-align:center; margin-top:1rem;">
+                ¿No tenés cuenta? <button id="goToRegister" class="btn btn-link">Registrarse</button>
+            </p>
+        </div>
+    </template>
+
+    <!-- Template de Registro -->
+    <template id="register">
+        <div class="F01">
+            <h1 class="title">Se parte de Nubbi!</h1>
+            <div id="registerForm">
+
+                <div class="form-group">
+                    <p id="registerErrors"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputNombre">Nombre completo</label>
+                    <input class="form-control" type="text" id="inputNombre" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="inputUserName">Nombre de usuario</label>
+                    <input class="form-control" type="text" id="inputUserName" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="inputPassword">Contraseña</label>
+                    <input class="form-control" type="password" id="inputPassword" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="inputPerro">Nombre del perro</label>
+                    <input class="form-control" type="text" id="inputPerro" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="dogSize">Tamaño del perro</label>
+                    <select id="dogSize" class="form-control" required>
+                        <option value="">Seleccione un tamaño</option>
+                        <option value="chico">Chico</option>
+                        <option value="mediano">Mediano</option>
+                        <option value="grande">Grande</option>
+                    </select>
+                </div>
+                <button type="button" id="btnRegister" class="btn btn-primary">Registrarse</button>
+            </div>
+            <p style="text-align:center; margin-top:1rem;">
+                ¿Ya tenés cuenta? <button id="goToLogin" class="btn btn-link">Iniciar sesión</button>
+            </p>
+        </div>
+    </template>
+
+    <!-- Template Dashboard Cliente -->
+    <template id="dashboard-cliente">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>🐕 Dashboard Cliente</h1>
+                <div class="user-info">
+                    <h3>Bienvenido <span id="nombreCliente"></span></h3>
+                    <p><strong>Tu Perro:</strong> <span id="nombrePerro"></span> (<span id="tamanoPerro"></span>)</p>
+                </div>
+            </div>
+
+            <!-- Navegación -->
+            <div class="navigation-buttons">
+                <button type="button" class="btn-nav" id="btnContratarServicio">Contratar Servicio</button>
+                <button type="button" class="btn-nav" id="btnVerContratacion">Ver Mi Contratación</button>
+                <button type="button" class="btn-nav" id="btnInfoPaseadores">Info Paseadores</button>
+                <button id="btnLogoutCliente" class="btn-nav btn-logout">Cerrar Sesión</button>
+            </div>
+
+            <!-- Área de contenido dinámico -->
+            <div class="content-area">
+                <div id="contenidoCliente"></div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template Dashboard Paseador -->
+    <template id="dashboard-paseador">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>🚶‍♂️ Dashboard Paseador</h1>
+                <div class="user-info">
+                    <h3>Bienvenido <span id="nombrePaseador"></span></h3>
+                    <p>Gestiona tus contrataciones y perros asignados</p>
+                </div>
+            </div>
+
+            <!-- Navegación -->
+            <div class="navigation-buttons">
+                <button type="button" class="btn-nav" id="btnContratacionesPendientes">Contrataciones Pendientes</button>
+                <button type="button" class="btn-nav" id="btnPerrosAsignados">Mis Perros Asignados</button>
+                <button id="btnLogoutPaseador" class="btn-nav btn-logout">Cerrar Sesión</button>
+            </div>
+
+            <!-- Área de contenido dinámico -->
+            <div class="content-area">
+                <div id="contenidoPaseador"></div>
+            </div>
+        </div>
+    </template>
+
+    <template id="dashboard">
+        <h1>Bienvenido al Dashboard</h1>
+    </template>
+
+    <!-- Templates para Cliente -->
+    
+    <!-- Template: Estado de contratación actual -->
+    <template id="cliente-contratacion-estado">
+        <div class="card">
+            <div class="card-header" id="estadoClass">
+                <h5>Estado de tu contratación</h5>
+            </div>
+            <div class="card-body">
+                <p>Contratación con el paseador: <strong id="nombrePaseadorContrato"></strong> (<span id="usernamePaseadorContrato"></span>)</p>
+                <p>Estado: <span class="badge" id="estadoBadge"></span></p>
+                <p>Tu perro: <strong id="nombrePerroContrato"></strong> (<span id="tamanoPerroContrato"></span>)</p>
+                <p id="mensajeEstado"></p>
+                <p id="mensajeCancelacion" style="display: none;"></p>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template: Contratar servicio -->
+    <template id="cliente-contratar-servicio">
+        <div class="content-title">Contratar Servicio de Paseador</div>
+        <div id="mensajeContratacion"></div>
+        <div id="contenidoContratacion"></div>
+    </template>
+
+    <!-- Template: No hay paseadores disponibles -->
+    <template id="cliente-sin-paseadores">
+        <div class="alert alert-warning">
+            No hay paseadores disponibles para tu perro de tamaño <strong id="tamanoPerroSin"></strong> en este momento.
+        </div>
+    </template>
+
+    <!-- Template: Formulario seleccionar paseador -->
+    <template id="cliente-form-paseador">
+        <div class="form-group mb-3">
+            <label for="selectPaseador">Selecciona un paseador:</label>
+            <select id="selectPaseador" class="form-control">
+                <option value="">Seleccione un paseador</option>
+            </select>
+        </div>
+        <button id="btnSolicitarContratacion" class="btn btn-primary">Solicitar Contratación</button>
+    </template>
+
+    <!-- Template: Ver mi contratación -->
+    <template id="cliente-ver-contratacion">
+        <div class="content-title">Mi Contratación</div>
+        <div id="mensajeCancelacion"></div>
+        <div id="contenidoMiContratacion"></div>
+    </template>
+
+    <!-- Template: Sin contratación activa -->
+    <template id="cliente-sin-contratacion">
+        <div class="alert alert-info">
+            No tienes ninguna contratación activa en este momento.
+        </div>
+    </template>
+
+    <!-- Template: Detalles de contratación -->
+    <template id="cliente-detalles-contratacion">
+        <div class="alert" id="alertContratacion">
+            <h6 id="tituloContratacion"></h6>
+            <p><strong>Paseador:</strong> <span id="nombrePaseadorDetalle"></span> (<span id="usernamePaseadorDetalle"></span>)</p>
+            <p><strong>Estado:</strong> <span class="badge" id="estadoContratacionDetalle"></span></p>
+            <p><strong>Tu perro:</strong> <span id="nombrePerroDetalle"></span> (<span id="tamanoPerroDetalle"></span>)</p>
+            <p><strong>ID Contratación:</strong> <span id="idContratacionDetalle"></span></p>
+            <p id="mensajeFelicitacion" class="text-success" style="display: none;"><strong>¡Felicitaciones! Tu perro ya está siendo paseado. El paseador se encargará de finalizar el servicio.</strong></p>
+        </div>
+        <div id="botonesContratacion"></div>
+    </template>
+
+    <!-- Template: Información de paseadores -->
+    <template id="cliente-info-paseadores">
+        <div class="content-title">Información de Paseadores</div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Paseador</th>
+                        <th>Cantidad de Perros Asignados</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaPaseadores">
+                </tbody>
+            </table>
+        </div>
+    </template>
+
+    <!-- Templates para Paseador -->
+
+    <!-- Template: Contrataciones pendientes -->
+    <template id="paseador-contrataciones-pendientes">
+        <div class="content-title">Contrataciones Pendientes</div>
+        <div id="mensajeProcesamiento"></div>
+        <div id="contenidoContratacionesPendientes"></div>
+    </template>
+
+    <!-- Template: Sin contrataciones pendientes -->
+    <template id="paseador-sin-pendientes">
+        <div class="alert alert-info">
+            No tienes contrataciones pendientes en este momento.
+        </div>
+    </template>
+
+    <!-- Template: Tabla de contrataciones pendientes -->
+    <template id="paseador-tabla-pendientes">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Perro</th>
+                        <th>Tamaño</th>
+                        <th>Cupos Necesarios</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaContratacionesPendientes">
+                </tbody>
+            </table>
+        </div>
+    </template>
+
+    <!-- Template: Perros asignados -->
+    <template id="paseador-perros-asignados">
+        <div class="content-title">Mis Perros Asignados</div>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <h4>Cupos Ocupados</h4>
+                <p class="stat-number" id="cuposOcupados">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>Cupos Máximos</h4>
+                <p class="stat-number" id="cuposMaximos">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>% Ocupación</h4>
+                <p class="stat-number" id="porcentajeOcupacion">0%</p>
+            </div>
+        </div>
+        
+        <div id="contenidoPerros"></div>
+    </template>
+
+    <!-- Template: Sin perros asignados -->
+    <template id="paseador-sin-perros">
+        <div class="alert alert-info">
+            No tienes perros asignados actualmente.
+        </div>
+    </template>
+
+    <!-- Template: Tabla de perros asignados -->
+    <template id="paseador-tabla-perros">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nombre del Perro</th>
+                        <th>Tamaño</th>
+                        <th>Cupos que Ocupa</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaPerrosAsignados">
+                </tbody>
+            </table>
+        </div>
+    </template>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+    <!-- Cargar clases y precargar sistema -->
+    <script src="js/clases/perro.js"></script>
+    <script src="js/clases/cliente.js"></script>
+    <script src="js/clases/contratacion.js"></script>
+    <script src="js/clases/paseador.js"></script>
+    <script src="js/sistema.js"></script>
+
+    <!-- Cargar paginas y navegacion -->
+    <script src="js/utils/navigation.js"></script>
+    <script src="js/pages/init-login.js"></script>
+    <script src="js/pages/init-dashboard-cliente.js"></script>
+    <script src="js/pages/init-dashboard-paseador.js"></script>
+    <script src="js/pages/init-register.js"></script>
+    <script src="js/index.js"></script>
+</body>
+
+</html>
