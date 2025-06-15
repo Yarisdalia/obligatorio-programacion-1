@@ -105,7 +105,6 @@
             <!-- Navegación -->
             <div class="navigation-buttons">
                 <button type="button" class="btn-nav" id="btnContratarServicio">Contratar Servicio</button>
-                <button type="button" class="btn-nav" id="btnVerContratacion">Ver Mi Contratación</button>
                 <button type="button" class="btn-nav" id="btnInfoPaseadores">Info Paseadores</button>
                 <button id="btnLogoutCliente" class="btn-nav btn-logout">Cerrar Sesión</button>
             </div>
@@ -148,20 +147,20 @@
 
     <!-- Templates para Cliente -->
     
-    <!-- Template: Estado de contratación actual -->
-    <template id="cliente-contratacion-estado">
-        <div class="card">
-            <div class="card-header" id="estadoClass">
-                <h5>Estado de tu contratación</h5>
-            </div>
-            <div class="card-body">
-                <p>Contratación con el paseador: <strong id="nombrePaseadorContrato"></strong> (<span id="usernamePaseadorContrato"></span>)</p>
-                <p>Estado: <span class="badge" id="estadoBadge"></span></p>
-                <p>Tu perro: <strong id="nombrePerroContrato"></strong> (<span id="tamanoPerroContrato"></span>)</p>
-                <p id="mensajeEstado"></p>
-                <p id="mensajeCancelacion" style="display: none;"></p>
-            </div>
+    <!-- Template: Detalles de contratación unificado -->
+    <template id="cliente-contratacion-detalles">
+        <div class="content-title">Mi Contratación</div>
+        <div id="mensajeCancelacion"></div>
+        <div class="alert" id="alertContratacion">
+            <h6 id="tituloContratacion"></h6>
+            <p><strong>Paseador:</strong> <span id="nombrePaseadorDetalle"></span> (<span id="usernamePaseadorDetalle"></span>)</p>
+            <p><strong>Estado:</strong> <span class="badge" id="estadoContratacionDetalle"></span></p>
+            <p><strong>Tu perro:</strong> <span id="nombrePerroDetalle"></span> (<span id="tamanoPerroDetalle"></span>)</p>
+            <p><strong>ID Contratación:</strong> <span id="idContratacionDetalle"></span></p>
+            <p id="mensajeEstado"></p>
+            <p id="mensajeFelicitacion" class="text-success" style="display: none;"><strong>¡Felicitaciones! Tu perro ya está siendo paseado. El paseador se encargará de finalizar el servicio.</strong></p>
         </div>
+        <div id="botonesContratacion"></div>
     </template>
 
     <!-- Template: Contratar servicio -->
@@ -189,32 +188,7 @@
         <button id="btnSolicitarContratacion" class="btn btn-primary">Solicitar Contratación</button>
     </template>
 
-    <!-- Template: Ver mi contratación -->
-    <template id="cliente-ver-contratacion">
-        <div class="content-title">Mi Contratación</div>
-        <div id="mensajeCancelacion"></div>
-        <div id="contenidoMiContratacion"></div>
-    </template>
 
-    <!-- Template: Sin contratación activa -->
-    <template id="cliente-sin-contratacion">
-        <div class="alert alert-info">
-            No tienes ninguna contratación activa en este momento.
-        </div>
-    </template>
-
-    <!-- Template: Detalles de contratación -->
-    <template id="cliente-detalles-contratacion">
-        <div class="alert" id="alertContratacion">
-            <h6 id="tituloContratacion"></h6>
-            <p><strong>Paseador:</strong> <span id="nombrePaseadorDetalle"></span> (<span id="usernamePaseadorDetalle"></span>)</p>
-            <p><strong>Estado:</strong> <span class="badge" id="estadoContratacionDetalle"></span></p>
-            <p><strong>Tu perro:</strong> <span id="nombrePerroDetalle"></span> (<span id="tamanoPerroDetalle"></span>)</p>
-            <p><strong>ID Contratación:</strong> <span id="idContratacionDetalle"></span></p>
-            <p id="mensajeFelicitacion" class="text-success" style="display: none;"><strong>¡Felicitaciones! Tu perro ya está siendo paseado. El paseador se encargará de finalizar el servicio.</strong></p>
-        </div>
-        <div id="botonesContratacion"></div>
-    </template>
 
     <!-- Template: Información de paseadores -->
     <template id="cliente-info-paseadores">
@@ -329,6 +303,7 @@
 
     <!-- Cargar paginas y navegacion -->
     <script src="js/utils/navigation.js"></script>
+    <script src="js/utils/mostrarMensaje.js"></script>
     <script src="js/pages/init-login.js"></script>
     <script src="js/pages/init-dashboard-cliente.js"></script>
     <script src="js/pages/init-dashboard-paseador.js"></script>

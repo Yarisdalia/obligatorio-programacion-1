@@ -1,8 +1,3 @@
-// Función auxiliar para mostrar mensajes
-function mostrarMensaje(contenedor, tipo, mensaje) {
-    contenedor.innerHTML = '<div class="alert alert-' + tipo + '">' + mensaje + '</div>';
-}
-
 function initDashboardPaseador() {
     const paseador = sistema.userLogged;
     
