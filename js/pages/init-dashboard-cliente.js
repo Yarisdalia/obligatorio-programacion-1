@@ -28,7 +28,7 @@ function initDashboardCliente() {
 }
 
 function setActiveButton(activeButtonId) {
-    document.querySelectorAll(".btn-nav").forEach(btn => {
+    document.querySelectorAll(".btn-nav").forEach(function(btn) {
         if (btn.id !== "btnLogoutCliente") {
             btn.classList.remove("active");
         }
