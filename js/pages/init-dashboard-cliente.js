@@ -36,8 +36,6 @@ function setActiveButton(activeButtonId) {
     let currentClasses = document.querySelector("#" + activeButtonId).getAttribute("class")
     let newClasses = currentClasses + " active";
     document.querySelector("#" + activeButtonId).setAttribute("class", newClasses);
-
-    //document.querySelector("#" + activeButtonId).classList.add("active");
 }
 
 function mostrarPanelContratacion() {
