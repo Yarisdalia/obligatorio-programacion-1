@@ -40,7 +40,7 @@ const cliente17 = new Cliente("Pablo", "pablo", "Pablo123", new Perro("daisy", "
 const cliente18 = new Cliente("Quimey", "quimey", "Quimey123", new Perro("ragnar", "grande"));
 const cliente19 = new Cliente("Raul", "raul", "Raul123", new Perro("maya", "chico"));
 const cliente20 = new Cliente("Sara", "sara", "Sara123", new Perro("lucky", "mediano"));
-
+sistema.registrarCliente("Sara", "sara", "Sara123", "lucky", "mediano");
 sistema.agregarCliente(cliente1);
 sistema.agregarCliente(cliente2);
 sistema.agregarCliente(cliente3);
