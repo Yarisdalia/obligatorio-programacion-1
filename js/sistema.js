@@ -13,12 +13,12 @@ class Sistema {
             return "Todos los campos son obligatorios";
         }
 
-        if (this.existeUsername(username)) {
+        if (this.#existeUsername(username)) {
             return "El nombre de usuario ya existe";
         }
 
         // Validar password
-        const resultValidatePassword = this.validarPassword(password);
+        const resultValidatePassword = this.#validarPassword(password);
         if (resultValidatePassword !== "ok") {
             return resultValidatePassword;
         }
@@ -36,7 +36,7 @@ class Sistema {
         this.userLogged = null;
 
         // Validar password
-        const resultValidatePassword = this.validarPassword(password);
+        const resultValidatePassword = this.#validarPassword(password);
         if (resultValidatePassword !== "ok") {
             return resultValidatePassword;
         }
@@ -66,7 +66,7 @@ class Sistema {
         const tamanoPerro = cliente.perro.tamano;
 
         // Determinar cuántos cupos necesita el perro según su tamaño
-        let cuposNecesarios = this.calcularCuposNecesarios(tamanoPerro);
+        let cuposNecesarios = this.#calcularCuposNecesarios(tamanoPerro);
 
         // Revisar cada paseador para ver si tiene cupos disponibles y es compatible
         for (let i = 0; i < this.paseadores.length; i++) {
@@ -109,7 +109,7 @@ class Sistema {
     // Verificar si cliente tiene contratación activa
     getContratacionActual(cliente) {
         for (let i = 0; i < this.contrataciones.length; i++) {
-            if (this.contrataciones[i].cliente.id === cliente.id &&
+            if (this.contrataciones[i]?.cliente?.id === cliente.id &&
                 (this.contrataciones[i].estado === "pendiente" || this.contrataciones[i].estado === "aprobada")) {
                 return this.contrataciones[i];
             }
@@ -146,7 +146,7 @@ class Sistema {
         const tamanoPerro = contratacion.cliente.perro.tamano;
 
         // Determinar cuántos cupos necesita el perro según su tamaño
-        let cuposNecesarios = this.calcularCuposNecesarios(tamanoPerro);
+        let cuposNecesarios = this.#calcularCuposNecesarios(tamanoPerro);
 
         // Verificar cupos disponibles
         const cuposOcupados = this.calcularCuposOcupados(paseador);
@@ -234,7 +234,7 @@ class Sistema {
     // --------------------------------- validaciones que se reutilizan ---------------------------------
 
     // Validar que el username no exista
-    existeUsername(username) {
+    #existeUsername(username) {
         // Verificar en paseadores
         for (let i = 0; i < this.paseadores.length; i++) {
             if (this.paseadores[i].username === username) {
@@ -252,7 +252,7 @@ class Sistema {
         return false;
     }
 
-    validarPassword(password) {
+    #validarPassword(password) {
         if (password.length < 5) {
             return "La contraseña debe tener al menos 5 caracteres";
         }
@@ -299,7 +299,7 @@ class Sistema {
     }
 
     // Calcular cupos necesarios para un perro según su tamaño
-    calcularCuposNecesarios(tamanoPerro) {
+   #calcularCuposNecesarios(tamanoPerro) {
         if (tamanoPerro === "grande") {
             return 4;
         } else if (tamanoPerro === "mediano") {
