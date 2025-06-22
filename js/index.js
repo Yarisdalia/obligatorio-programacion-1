@@ -19,7 +19,7 @@ sistema.agregarPaseador(paseador5);
 // ------------------------------ PASEADORES ------------------------------
 
 // ------------------------------ CLIENTES ------------------------------
-// Según la tabla: Usuario, Contraseña, Nombre del perro, Tamaño
+// Según la tabla: Nombre Cliente, Usuario del cliente, Contraseña, Nombre del perro, Tamaño
 sistema.registrarCliente("Tomas", "tomas", "Tomas123", "lucky", "mediano");
 sistema.registrarCliente("Ana", "ana", "Ana123", "luna", "grande");
 sistema.registrarCliente("Bruno", "bruno", "Bruno123", "boby", "mediano");
@@ -40,26 +40,6 @@ sistema.registrarCliente("Pablo", "pablo", "Pablo123", "daisy", "chico");
 sistema.registrarCliente("Quimey", "quimey", "Quimey123", "ragnar", "grande");
 sistema.registrarCliente("Raul", "raul", "Raul123", "maya", "chico");
 sistema.registrarCliente("Sara", "sara", "Sara123", "lucky", "mediano");
-sistema.agregarCliente(cliente1);
-sistema.agregarCliente(cliente2);
-sistema.agregarCliente(cliente3);
-sistema.agregarCliente(cliente4);
-sistema.agregarCliente(cliente5);
-sistema.agregarCliente(cliente6);
-sistema.agregarCliente(cliente7);
-sistema.agregarCliente(cliente8);
-sistema.agregarCliente(cliente9);
-sistema.agregarCliente(cliente10);
-sistema.agregarCliente(cliente11);
-sistema.agregarCliente(cliente12);
-sistema.agregarCliente(cliente13);
-sistema.agregarCliente(cliente14);
-sistema.agregarCliente(cliente15);
-sistema.agregarCliente(cliente16);
-sistema.agregarCliente(cliente17);
-sistema.agregarCliente(cliente18);
-sistema.agregarCliente(cliente19);
-sistema.agregarCliente(cliente20);
 // ------------------------------ CLIENTES ------------------------------
 
 // ------------------------------ CONTRATACIONES ------------------------------
@@ -82,13 +62,13 @@ sistema.agregarContratacion(contratacion1);
 paseador2.agregarContratacion(contratacion1);
 
 sistema.agregarContratacion(contratacion2);
-paseador2.agregarContratacion(contratacion2);
+paseador3.agregarContratacion(contratacion2);
 
 sistema.agregarContratacion(contratacion3);
 paseador2.agregarContratacion(contratacion3);
 
 sistema.agregarContratacion(contratacion4);
-paseador2.agregarContratacion(contratacion4);
+paseador4.agregarContratacion(contratacion4);
 
 sistema.agregarContratacion(contratacion5);
 paseador2.agregarContratacion(contratacion5);

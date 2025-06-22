@@ -227,10 +227,6 @@ class Sistema {
         this.paseadores.push(paseador);
     }
 
-    agregarCliente(cliente) {
-        this.clientes.push(cliente);
-    }
-
     agregarContratacion(contratacion) {
         this.contrataciones.push(contratacion);
     }
