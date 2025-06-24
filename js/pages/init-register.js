@@ -15,12 +15,9 @@ function onHandleRegister() {
     const resultado = sistema.registrarCliente(nombre, username, password, nombrePerro, tamanoPerro);
     
     if (resultado === "ok") {
-        mostrarMensaje(mensaje, "success", "Cliente registrado exitosamente");
-        setTimeout(() => {
-            navigateTo("login", initLogin);
-        }, 1500);
+        navigateTo("login", initLogin);
     } else {
-        mostrarMensaje(mensaje, "danger", resultado);
+        mensaje.innerHTML = resultado;
     }
 }
 

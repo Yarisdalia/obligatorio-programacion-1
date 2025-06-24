@@ -113,7 +113,6 @@ function mostrarPanelContratacion() {
 
             if (paseador) {
                 sistema.crearContratacion(cliente, paseador);
-                mostrarMensaje(mensaje, "success", "Contratación solicitada");
                 mostrarPanelContratacion();
             }
         });

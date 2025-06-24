@@ -2,12 +2,6 @@ function initLogin() {
     // Limpiar usuario logueado por si acaso
     sistema.userLogged = null;
     
-    // Limpiar mensajes de errores anteriores por si acaso
-    const errorDiv = document.querySelector("#loginError");
-    if (errorDiv) {
-        errorDiv.innerHTML = "";
-    }
-    
     document.querySelector("#btnLogin").addEventListener("click", onHandleLogin);
     
     document.querySelector("#goToRegister").addEventListener("click", onGoToRegister);
@@ -16,13 +10,10 @@ function initLogin() {
 function onHandleLogin() {
     const username = document.querySelector("#inputUser").value;
     const password = document.querySelector("#password").value;
-    const errorDiv = document.querySelector("#loginError");
-
-    // Limpiar error anterior
-    errorDiv.innerHTML = "";
+    const errorP = document.querySelector("#loginError");
 
     if (username === "" || password === "") {
-        errorDiv.innerHTML = "Por favor complete todos los campos";
+        errorP.innerHTML = "Por favor complete todos los campos";
         return;
     }
 
@@ -35,7 +26,7 @@ function onHandleLogin() {
             navigateTo("dashboard-cliente", initDashboardCliente);
         }
     } else {
-        errorDiv.innerHTML = resultado;
+        errorP.innerHTML = resultado;
     }
 }
 
