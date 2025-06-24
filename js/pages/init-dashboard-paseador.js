@@ -42,7 +42,7 @@ function mostrarContratacionesPendientes() {
     // Calcular estadísticas de cupos
     const cuposOcupados = sistema.calcularCuposOcupados(paseador);
     const cuposMaximos = paseador.cupoMaximo;
-    const porcentajeOcupacion = cuposMaximos > 0 ? ((cuposOcupados / cuposMaximos) * 100).toFixed(1) : 0;
+    const porcentajeOcupacion = cuposMaximos > 0 ? Math.round((cuposOcupados / cuposMaximos) * 1000) / 10 : 0;
     
     let html = `
         <div class="content-title">Contrataciones Pendientes</div>
@@ -173,7 +173,7 @@ function mostrarPerrosAsignados() {
     // Calcular estadísticas de cupos
     const cuposOcupados = sistema.calcularCuposOcupados(paseador);
     const cuposMaximos = paseador.cupoMaximo;
-    const porcentajeOcupacion = cuposMaximos > 0 ? ((cuposOcupados / cuposMaximos) * 100).toFixed(1) : 0;
+    const porcentajeOcupacion = cuposMaximos > 0 ? Math.round((cuposOcupados / cuposMaximos) * 1000) / 10 : 0;
     
     let html = `
         <div class="content-title">Mis Perros Asignados</div>
