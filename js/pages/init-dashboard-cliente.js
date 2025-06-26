@@ -48,14 +48,30 @@ function mostrarPanelContratacion() {
         contenido.innerHTML = `
             <div class="content-title">Mi Contratación</div>
             <div id="mensajeContratacion"></div>
-            <div class="alert alert-info">
-                <h5>Estado: ${contratacionActual.estado}</h5>
-                <p><strong>Paseador:</strong> ${contratacionActual.paseador.nombre}</p>
-                <p><strong>Tu perro:</strong> ${contratacionActual.cliente.perro.nombre} (${contratacionActual.cliente.perro.tamano})</p>
-                ${contratacionActual.estado === "pendiente" ?
-                '<button id="btnCancelar" class="btn btn-danger">Cancelar</button>' :
-                ''}
-            </div>
+
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Paseador</th>
+                        <th>Perro</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>${contratacionActual.cliente.nombre}</td>
+                        <td>${contratacionActual.paseador.nombre}</td>
+                        <td>${contratacionActual.cliente.perro.nombre} (${contratacionActual.cliente.perro.tamano})</td>
+                        <td>${contratacionActual.estado}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" id="btnCancelar">Cancelar</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         `;
 
         // Configurar botón cancelar

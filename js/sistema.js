@@ -223,11 +223,16 @@ class Sistema {
     }
 
     // -------------------------- funciones para agregar elementos al sistema ---------------------------------
-    agregarPaseador(paseador) {
+    agregarPaseador(nombre, username, password, cupoMaximo) {
+        const paseador = new Paseador(nombre, username, password, cupoMaximo);
         this.paseadores.push(paseador);
     }
 
-    agregarContratacion(contratacion) {
+    agregarContratacion(cliente, paseador, estado = "pendiente") {
+        const contratacion = new Contratacion(cliente, paseador, estado);
+
+        paseador.agregarContratacion(contratacion);
+
         this.contrataciones.push(contratacion);
     }
 
@@ -299,7 +304,7 @@ class Sistema {
     }
 
     // Calcular cupos necesarios para un perro según su tamaño
-   #calcularCuposNecesarios(tamanoPerro) {
+    #calcularCuposNecesarios(tamanoPerro) {
         if (tamanoPerro === "grande") {
             return 4;
         } else if (tamanoPerro === "mediano") {
